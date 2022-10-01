@@ -31,6 +31,8 @@ app.get("/students", (req, res) => {
       .then((data) => {
         res.json(data);
       })
+      res.status(500).jsonp({ error: 'message' })
+// => callback({ "error": "message" })
   });
 
 // setup http server to listen on HTTP_PORT
