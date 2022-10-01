@@ -30,7 +30,7 @@ app.get("/about", (req, res) => {
 app.get("/students", (req, res) => {
     data.getStudents()
       .then((data) => {
-        console.log("Error retrieving managers: " + err);
+        console.log("Error retrieving students: " + err);
         res.json(data);
       })
   });
@@ -38,15 +38,15 @@ app.get("/students", (req, res) => {
   app.get("/intIStudents", (req, res) => {
       data.getIntIStudents()
       .then((data) => {
-     if(data.isInternationalStudent == true){
+     if(data.isInternationalStudent === true){
         res.json(data);
       }
     })
   });
 
-  app.get("/programs", (req, res) => {
-    data.getPrograms()
-      .then((data) => {
+    app.get("/programs", (req, res) => {
+        data.getPrograms()
+         .then((data) => {
         res.json(data);
       })
   });
