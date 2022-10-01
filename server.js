@@ -34,12 +34,33 @@ app.get("/students", (req, res) => {
       })
   });
 
-  app.get("/intIstudents", (req, res) => {
-    data.getIntIstudents()
+  app.get("/intIStudents", (req, res) => {
+      data.getIntIStudents()
+      .then((data) => {
+     if(data.isInternationalStudent == true){
+        res.json(data);
+      }
+    })
+  });
+
+  app.get("/programs", (req, res) => {
+    data.getPrograms()
       .then((data) => {
         res.json(data);
       })
   });
+
+
+
+
+
+
+
+
+
+  app.use((req, res) => {
+    res.status(404).sendFile("/views/IMG.png");
+});
 
 // setup http server to listen on HTTP_PORT
 app.listen(HTTP_PORT,() => {
