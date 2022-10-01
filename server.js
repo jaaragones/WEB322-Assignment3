@@ -30,6 +30,7 @@ app.get("/about", (req, res) => {
 app.get("/students", (req, res) => {
     data.getStudents()
       .then((data) => {
+        console.log("Error retrieving managers: " + err);
         res.json(data);
       })
   });
@@ -51,15 +52,8 @@ app.get("/students", (req, res) => {
   });
 
 
-
-
-
-
-
-
-
   app.use((req, res) => {
-    res.status(404).send("<h2>404</h2><p>Im sorry The page you are trying to reach is NOT FOUND</p>");
+    res.status(404).send("<h2>404</h2><p>Im sorry! The page you are trying to reach is NOT FOUND!</p>");
 });
 
 
