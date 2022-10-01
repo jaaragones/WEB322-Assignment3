@@ -59,8 +59,9 @@ app.get("/students", (req, res) => {
 
 
   app.use((req, res) => {
-    res.status(404).sendFile(__dirname,"./views/IMG.png");
+    res.status(404).send("<h2>404</h2><p>Im sorry The page you are trying to reach is NOT FOUND</p>");
 });
+
 
 // setup http server to listen on HTTP_PORT
 app.listen(HTTP_PORT,() => {
