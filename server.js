@@ -38,9 +38,8 @@ app.get("/students", (req, res) => {
   app.get("/intIStudents", (req, res) => {
       data.getIntStudents()
       .then((data) => {
-     if(data.isInternationalStudent === true){
-        res.json(data);
-      }
+        var result = data.filter(data.isInternationalStudent === true)
+        res.json(result);
     })
   });
 
