@@ -59,7 +59,7 @@ app.get("/students", (req, res) => {
 
 
   app.use((req, res) => {
-    res.status(404).sendFile("./views/IMG.png");
+    res.status(404).sendFile(__dirname,'./views/IMG.png');
 });
 
 // setup http server to listen on HTTP_PORT
