@@ -26,14 +26,22 @@ app.get("/about", (req, res) => {
     res.sendFile(path.join(__dirname,'/views/about.html'));
 });
 
+// Retrieves Students Data
 app.get("/students", (req, res) => {
     data.getStudents()
       .then((data) => {
         res.json(data);
       })
-      res.status(500).jsonp({ error: 'message' })
-// => callback({ "error": "message" })
+  });
+
+  app.get("/intIstudents", (req, res) => {
+    data.getIntIstudents()
+      .then((data) => {
+        res.json(data);
+      })
   });
 
 // setup http server to listen on HTTP_PORT
-app.listen(HTTP_PORT);
+app.listen(HTTP_PORT,() => {
+    console.log('Express http server listening on ${HTTP_PORT}')
+});
