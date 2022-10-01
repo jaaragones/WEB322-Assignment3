@@ -43,5 +43,5 @@ app.get("/students", (req, res) => {
 
 // setup http server to listen on HTTP_PORT
 app.listen(HTTP_PORT,() => {
-    res.send('Express http server listening on ${HTTP_PORT}')
+    console.log('Express http server listening on ${HTTP_PORT}')
 });
