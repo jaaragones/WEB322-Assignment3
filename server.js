@@ -31,10 +31,6 @@ app.get("/students", (req, res) => {
       .then((data) => {
         res.json(data);
       })
-      .catch((msg) => {
-        console.log("Error retrieving managers: " + msg);
-        res.json({ message: msg });
-      });
   });
 
 // setup http server to listen on HTTP_PORT
