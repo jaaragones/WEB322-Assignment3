@@ -26,8 +26,8 @@ app.get("/about", (req, res) => {
     res.sendFile(path.join(__dirname,'/views/about.html'));
 });
 
-app.get("/managers", (req, res) => {
-    data.getManagers()
+app.get("/students", (req, res) => {
+    data.getStudents()
       .then((data) => {
         res.json(data);
       })
