@@ -15,7 +15,7 @@ var app = express();
 var path  = require('path');
 
 app.use(express.static('public'));
-var data = require(path.join(__dirname, 'data-service.js'));
+const dataServ = require('./data-service.js');
 
 // setup a 'route' to listen on the default url path
 app.get("/", (req, res) => {
@@ -38,7 +38,7 @@ app.get("/students", (req, res) => {
   app.get("/intIStudents", (req, res) => {
       data.getIntStudents()
       .then((data) => {
-        var result = data.filter(data.isInternationalStudent === true)
+        var result = data.filter(this.isInternationalStudent === true)
         res.json(result);
     })
   });
@@ -58,5 +58,5 @@ app.get("/students", (req, res) => {
 
 // setup http server to listen on HTTP_PORT
 app.listen(HTTP_PORT,() => {
-    console.log('Express http server listening on ${HTTP_PORT}')
+    console.log('Express http server listening on'+ HTTP_PORT)
 });
