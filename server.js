@@ -48,7 +48,6 @@ app.get("/students", (req, res) => {
   app.get("/intlstudents", (req, res) => {
       dataServ.getInternationalStudents()
       .then((data) => {
-        var result = data.filter(this.isInternationalStudent === true)
         res.json(result);
     })
   });
