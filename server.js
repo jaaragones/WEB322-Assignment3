@@ -48,7 +48,7 @@ app.get("/students", (req, res) => {
   app.get("/intlstudents", (req, res) => {
       dataServ.getInternationalStudents()
       .then((data) => {
-        res.json(result);
+        res.json(data);
     })
   });
 
