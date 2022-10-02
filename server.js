@@ -17,6 +17,12 @@ var path  = require('path');
 app.use(express.static('public'));
 const dataServ = require('./data-service.js');
 
+
+
+function onHttpStart() {
+  console.log("Express http server listening on: " + HTTP_PORT);
+}
+
 // setup a 'route' to listen on the default url path
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname,'/views/home.html'));
@@ -59,9 +65,7 @@ app.get("/students", (req, res) => {
 // setup http server to listen on HTTP_PORT
 dataService.initialize()
 .then(()=>{
-  app.listen(HTTP_PORT,() => {
-    console.log('Express http server listening on '+ HTTP_PORT)
+    app.listen(HTTP_PORT, onHttpStart);
 }).catch((err)=>{
     console.log("Error: ", err)
-})
 })
