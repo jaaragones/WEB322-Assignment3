@@ -57,6 +57,11 @@ app.get("/students", (req, res) => {
 
 
 // setup http server to listen on HTTP_PORT
-app.listen(HTTP_PORT,() => {
-    console.log('Express http server listening on'+ HTTP_PORT)
-});
+dataService.initialize()
+.then(()=>{
+  app.listen(HTTP_PORT,() => {
+    console.log('Express http server listening on '+ HTTP_PORT)
+}).catch((err)=>{
+    console.log("Error: ", err)
+})
+})
