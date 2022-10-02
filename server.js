@@ -34,7 +34,7 @@ app.get("/about", (req, res) => {
 
 // Retrieves Students Data
 app.get("/students", (req, res) => {
-    data.getStudents()
+  dataServ.getStudents()
       .then((data) => {
         console.log("Error retrieving students: " + err);
         res.json(data);
@@ -42,7 +42,7 @@ app.get("/students", (req, res) => {
   });
 
   app.get("/intIStudents", (req, res) => {
-      data.getIntStudents()
+    dataServ.getIntStudents()
       .then((data) => {
         var result = data.filter(this.isInternationalStudent === true)
         res.json(result);
@@ -50,7 +50,7 @@ app.get("/students", (req, res) => {
   });
 
     app.get("/programs", (req, res) => {
-        data.getPrograms()
+      dataServ.getPrograms()
          .then((data) => {
         res.json(data);
       })
@@ -63,7 +63,7 @@ app.get("/students", (req, res) => {
 
 
 // setup http server to listen on HTTP_PORT
-dataService.initialize()
+dataServ.initialize()
 .then(()=>{
     app.listen(HTTP_PORT, onHttpStart);
 }).catch((err)=>{
