@@ -36,9 +36,13 @@ app.get("/about", (req, res) => {
 app.get("/students", (req, res) => {
   dataServ.getAllStudents()
       .then((data) => {
-        console.log("Error retrieving students: " + err);
         res.json(data);
       })
+      .catch((err) => {
+        console.log("Error retrieving students: " + err);
+        res.json({ message: err });
+      });
+        
   });
 
   app.get("/intIStudents", (req, res) => {
