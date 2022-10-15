@@ -8,7 +8,6 @@
 *  Online (Cyclic) Link: https://awful-dog-shawl.cyclic.app
 *
 ********************************************************************************/ 
-
 var HTTP_PORT = process.env.PORT || 8080;
 var express = require("express");
 var app = express();
@@ -16,6 +15,12 @@ var path  = require('path');
 
 app.use(express.static('public'));
 const dataServ = require('./data-service.js');
+const fsf = require('fs');
+const multer = require('multer');
+const bodyParser = require('body-parser')
+
+
+ 
 
 
 
@@ -32,18 +37,111 @@ app.get("/about", (req, res) => {
     res.sendFile(path.join(__dirname,'/views/about.html'));
 });
 
+app.get("/students/add", (req, res) => {
+  res.sendFile(path.join(__dirname,'/views/addStudent.html'));
+});
+
+app.get("/images/add", (req, res) => {
+  res.sendFile(path.join(__dirname,'/views/addImage.html'));
+});
+
+app.get("/images", (req, res) => {
+  fsf.readdir(path.join(__dirname, "/public/images/uploaded"), function (err, items) {
+
+    var obj = { images: [] };
+    var size = items.length;
+    for (var i = 0; i < items.length; i++) {
+      obj.images.push(items[i]);
+    }
+    res.json(obj);
+  });});
+
+
+  // Urlencoded 
+  app.use(bodyParser.urlencoded({ extended: true }));
+
+ // Adding multer
+  const storage = multer.diskStorage({
+  destination: "./public/images/uploaded",
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }});
+  const upload = multer({storage:storage});
+
+
+
+// Post Route
+app.post("/images/add", upload.single("imageFile"), (req, res) => {
+  res.redirect("/images");
+});
+
+app.post("/students/add", (req, res) => {
+dataServ.addStudent(req.body)
+.then(() => {
+  res.redirect("/students");
+})});
+
 // Retrieves Students Data
 app.get("/students", (req, res) => {
-  dataServ.getAllStudents()
+  if (req.query.status) {
+    dataServ.getStudentsByStatus(req.query.status)
       .then((data) => {
         res.json(data);
       })
       .catch((err) => {
+        res.send(err);;
+      })
+  }
+  else if (req.query.program) {
+      dataServ.getStudentsByProgramCode(req.query.program)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((err) => {
+          res.send(err);
+        })
+    }
+    else if (req.query.expectedCredential) {
+      dataServ.getStudentsByExpectedCredential(req.query.expectedCredential)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((err) => {
+          res.send(err);
+        })
+    }
+    else {
+      dataServ.getAllStudents()
+      .then((data) => {
+          res.json(data);
+        })
+        .catch((err) => {
         console.log("Error retrieving students: " + err);
         res.json({ message: err });
-      });
-        
+        });
+    }
+  // dataServ.getAllStudents()
+  //     .then((data) => {
+  //       res.json(data);
+  //     })
+  //     .catch((err) => {
+  //       console.log("Error retrieving students: " + err);
+  //       res.json({ message: err });
+  //     });
   });
+  
+  app.get("/students/:studentID", (req, res) => {
+    dataServ.getStudentById(req.params.studentID)
+    .then((data) => {
+      res.json(data);
+  })
+  .catch((err) => {
+    console.log(err);
+    res.send(err);
+  })
+});
+
+ 
 
   app.get("/intlstudents", (req, res) => {
       dataServ.getInternationalStudents()
@@ -58,6 +156,9 @@ app.get("/students", (req, res) => {
         res.json(data);
       })
   });
+
+
+
 
 
   app.use((req, res) => {
