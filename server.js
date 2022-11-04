@@ -12,18 +12,40 @@ var HTTP_PORT = process.env.PORT || 8080;
 var express = require("express");
 var app = express();
 var path = require('path');
-const exphbs= require("express-handlebars");
-app.use(express.static('public'));
 const dataServ = require('./data-service.js');
 const fsf = require('fs');
 const multer = require('multer');
 const bodyParser = require('body-parser');
-
+const exphbs = require("express-handlebars");
+app.use(express.static('public'));
 
 
 function onHttpStart() {
   console.log("Express http server listening on: " + HTTP_PORT);
 }
+
+
+//********************************************************************************************** */
+//ASS 4
+// setting up Handlebars
+app.engine('.hbs', exphbs.engine({extname: '.hbs',defaultLayout: "main",
+  helpers: {
+    navLink: function(url, options){
+      return '<li' + 
+          ((url == app.locals.activeRoute) ? ' class="active" ' : '') + 
+          '><a href="' + url + '">' + options.fn(this) + '</a></li>';},
+
+    equal: function (lvalue, rvalue, options) {
+      if (arguments.length < 3)
+        throw new Error("Handlebars Helper equal needs 2 parameters");
+      if (lvalue != rvalue) {
+        return options.inverse(this);
+      } else {
+        return options.fn(this);}}
+    }
+}));
+app.set('view engine', '.hbs');
+
 
 // activeRoute
 app.use(function (req, res, next) {
@@ -32,28 +54,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-
-
-// setting up Handlebars
-app.engine('.hbs', exphbs.engine({
-  extname: '.hbs',
-  defaultLayout: "main",
-  helpers: {
-    navLink: function (url, options) {
-      return '<li' +
-        ((url == app.locals.activeRoute) ? ' class="active" ' : '') +
-        '><a href="' + url + '">' + options.fn(this) + '</a></li>';
-    },
-    equal: function (lvalue, rvalue, options) {
-      if (arguments.length < 3)
-        throw new Error("Handlebars Helper equal needs 2 parameters");
-      if (lvalue != rvalue) {
-        return options.inverse(this);
-      } else {
-        return options.fn(this);}}
-  }
-}));
-app.set('view engine', '.hbs');
+//********************************************************************************************** */
 
 
 // setup a 'route' to listen on the default url path
@@ -77,19 +78,7 @@ app.get("/images/add", (req, res) => {
   res.render("addImage");
 });
 
-app.get("/images", (req, res) => {
-  fsf.readdir(path.join(__dirname, "/public/images/uploaded"), function (err, items) {
-
-    var obj = { images: [] };
-    var size = items.length;
-    for (var i = 0; i < items.length; i++) {
-      obj.images.push(items[i]);
-    }
-    res.json(obj);
-  });
-});
-
-
+//********************************************************************************************** */
 // Urlencoded 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -117,6 +106,19 @@ app.post("/students/add", (req, res) => {
     .then(() => {
       res.redirect("/students");
     })
+});
+
+
+app.get("/images", (req, res) => {
+  fsf.readdir(path.join(__dirname, "/public/images/uploaded"), function (err, items) {
+
+    var obj = { images: [] };
+    var size = items.length;
+    for (var i = 0; i < items.length; i++) {
+      obj.images.push(items[i]);
+    }
+    res.json(obj);
+  });
 });
 
 
