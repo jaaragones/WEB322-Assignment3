@@ -17,29 +17,41 @@ app.use(express.static('public'));
 const dataServ = require('./data-service.js');
 const fsf = require('fs');
 const multer = require('multer');
-const bodyParser = require('body-parser')
-
+const bodyParser = require('body-parser');
+const exphbs = require('express-handlebars');
 
 
 function onHttpStart() {
   console.log("Express http server listening on: " + HTTP_PORT);
 }
 
+// setting up Handlebars
+app.engine('.hbs', exphbs.engine({ extname: '.hbs',defaultLayout: "main" }));
+app.set('view engine', '.hbs');
+
+
+
+
+
 // setup a 'route' to listen on the default url path
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname,'/views/home.html'));
+// res.sendFile(path.join(__dirname,'/views/home.html'));
+res.render("home");
 });
 
 app.get("/about", (req, res) => {
-    res.sendFile(path.join(__dirname,'/views/about.html'));
+// res.sendFile(path.join(__dirname,'/views/about.html'));
+res.render("about");
 });
 
 app.get("/students/add", (req, res) => {
-  res.sendFile(path.join(__dirname,'/views/addStudent.html'));
+// res.sendFile(path.join(__dirname,'/views/addStudent.html'));
+res.render("addStudent");
 });
 
 app.get("/images/add", (req, res) => {
-  res.sendFile(path.join(__dirname,'/views/addImage.html'));
+// res.sendFile(path.join(__dirname,'/views/addImage.html'));
+  res.render("addImage");
 });
 
 app.get("/images", (req, res) => {
@@ -65,6 +77,9 @@ app.get("/images", (req, res) => {
   }});
   const upload = multer({storage:storage});
 
+
+app.engine('.hbs', exphbs.engine({ extname: '.hbs' }));
+app.set('view engine', '.hbs');
 
 
 // Post Route
@@ -154,8 +169,6 @@ app.get("/students", (req, res) => {
         res.json(data);
       })
   });
-
-
 
 
 
