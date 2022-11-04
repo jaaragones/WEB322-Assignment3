@@ -12,13 +12,13 @@ var HTTP_PORT = process.env.PORT || 8080;
 var express = require("express");
 var app = express();
 var path = require('path');
-
+const exphbs= require("express-handlebars");
 app.use(express.static('public'));
 const dataServ = require('./data-service.js');
 const fsf = require('fs');
 const multer = require('multer');
 const bodyParser = require('body-parser');
-const exphbs = require('express-handlebars');
+
 
 
 function onHttpStart() {
@@ -35,7 +35,7 @@ app.use(function (req, res, next) {
 
 
 // setting up Handlebars
-app.engine('.hbs', exphbs({
+app.engine('.hbs', exphbs.engine({
   extname: '.hbs',
   defaultLayout: "main",
   helpers: {
@@ -50,9 +50,7 @@ app.engine('.hbs', exphbs({
       if (lvalue != rvalue) {
         return options.inverse(this);
       } else {
-        return options.fn(this);
-      }
-    }
+        return options.fn(this);}}
   }
 }));
 app.set('view engine', '.hbs');
