@@ -28,12 +28,14 @@ function onHttpStart() {
 //********************************************************************************************** */
 //ASS 4
 // setting up Handlebars
-app.engine('.hbs', exphbs.engine({extname: '.hbs',defaultLayout: "main",
+app.engine('.hbs', exphbs.engine({
+  extname: '.hbs', defaultLayout: 'main',
   helpers: {
-    navLink: function(url, options){
-      return '<li' + 
-          ((url == app.locals.activeRoute) ? ' class="active" ' : '') + 
-          '><a href="' + url + '">' + options.fn(this) + '</a></li>';},
+    navLink: function (url, options) {
+      return '<li' +
+        ((url == app.locals.activeRoute) ? ' class="active" ' : '') +
+        '><a href="' + url + '">' + options.fn(this) + '</a></li>';
+    },
 
     equal: function (lvalue, rvalue, options) {
       if (arguments.length < 3)
@@ -41,8 +43,10 @@ app.engine('.hbs', exphbs.engine({extname: '.hbs',defaultLayout: "main",
       if (lvalue != rvalue) {
         return options.inverse(this);
       } else {
-        return options.fn(this);}}
+        return options.fn(this);
+      }
     }
+  }
 }));
 app.set('view engine', '.hbs');
 
@@ -92,10 +96,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-app.engine('.hbs', exphbs.engine({ extname: '.hbs' }));
-app.set('view engine', '.hbs');
-
-
 // Post Route
 app.post("/images/add", upload.single("imageFile"), (req, res) => {
   res.redirect("/images");
@@ -117,7 +117,7 @@ app.get("/images", (req, res) => {
     for (var i = 0; i < items.length; i++) {
       obj.images.push(items[i]);
     }
-    res.json(obj);
+    res.render("images", obj);
   });
 });
 
@@ -127,10 +127,10 @@ app.get("/students", (req, res) => {
   if (req.query.status) {
     dataServ.getStudentsByStatus(req.query.status)
       .then((data) => {
-        res.json(data);
+        res.render("students", { students: data });
       })
       .catch((err) => {
-        res.send(err);;
+        res.render({ message: "no results" });
       })
   }
   else if (req.query.program) {
