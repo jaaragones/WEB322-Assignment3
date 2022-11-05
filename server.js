@@ -3,7 +3,7 @@
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: John Aeron Aragones   Student ID: 121107213   Date: Oct 14 ,2022
+*  Name: John Aeron Aragones   Student ID: 121107213   Date: NOV 04 ,2022
 *
 *  Online (Cyclic) Link: https://dead-red-shrimp-kit.cyclic.app
 *
@@ -59,6 +59,20 @@ app.use(function (req, res, next) {
 });
 
 //********************************************************************************************** */
+app.post("/student/update", (req, res) => {
+  console.log(req.body);
+  res.redirect("/students");
+});
+
+app.post("/student/update", (req, res) => {
+  data.updateStudent(req.body).then((data) => {
+      console.log(req.body);
+      res.redirect("/students");
+  }).catch((err) => {
+      console.log(err);
+  })
+});
+
 
 
 // setup a 'route' to listen on the default url path
@@ -174,11 +188,10 @@ app.get("/students", (req, res) => {
 app.get("/students/:studentID", (req, res) => {
   dataServ.getStudentById(req.params.studentID)
     .then((data) => {
-      res.json(data);
+      res.render("student", { student: data }); 
     })
     .catch((err) => {
-      console.log(err);
-      res.send(err);
+      res.render("student",{message: "no results"});
     })
 });
 

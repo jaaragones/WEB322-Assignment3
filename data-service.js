@@ -125,3 +125,17 @@ module.exports.getStudentById = function(sid){
         resolve(tempArr);
     });
 }
+
+module.exports.updateStudent = function(studentData){
+    return new Promise((resolve, reject) => {
+        for (let i = 0; i < students.length; i++) {
+            if (students[i].studentID == studentData.studentID) {
+                students.splice(studentData.studentID - 1, 1, studentData);
+            }
+        }
+        if (students.length == 0) {
+            reject("No Result Returned!");
+        }
+        resolve(students);
+    });
+}
