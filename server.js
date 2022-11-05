@@ -16,6 +16,7 @@ const dataServ = require('./data-service.js');
 const fsf = require('fs');
 const multer = require('multer');
 const bodyParser = require('body-parser');
+const { resolveSoa } = require("dns");
 const exphbs = require("express-handlebars");
 app.use(express.static('public'));
 
@@ -150,29 +151,28 @@ app.get("/students", (req, res) => {
   else if (req.query.program) {
     dataServ.getStudentsByProgramCode(req.query.program)
       .then((data) => {
-        res.json(data);
+        res.render("students", {students: data});
       })
       .catch((err) => {
-        res.send(err);
+        res.render("students", {message: "no results"});
       })
   }
   else if (req.query.expectedCredential) {
     dataServ.getStudentsByExpectedCredential(req.query.expectedCredential)
       .then((data) => {
-        res.json(data);
+        res.render("students", {students: data});
       })
       .catch((err) => {
-        res.send(err);
+        res.render("students", {message: "no results"});
       })
   }
   else {
     dataServ.getAllStudents()
       .then((data) => {
-        res.json(data);
+        res.render("students", {students: data});
       })
       .catch((err) => {
-        console.log("Error retrieving students: " + err);
-        res.json({ message: err });
+        res.render("students", {message: "no results"});
       });
   }
   // dataServ.getAllStudents()
@@ -196,16 +196,20 @@ app.get("/students/:studentID", (req, res) => {
 });
 
 app.get("/intlstudents", (req, res) => {
-  dataServ.getInternationalStudents()
+  dataServ.getInternationalStudents(req.query.isInternationalStudent)
     .then((data) => {
-      res.json(data);
+      res.render("students",{students:data});
+    })
+    .catch((err) => {
+      res.render({message: "no results"});
     })
 });
 
 app.get("/programs", (req, res) => {
-  dataServ.getPrograms()
-    .then((data) => {
-      res.json(data);
+  dataServ.getPrograms().then((data)=>{
+    res.render("programs",{programs:data});
+    }).catch((err) => {
+      res.render({message: "no results"})
     })
 });
 

@@ -1,6 +1,7 @@
 const fsf = require('fs');
 var students = [];
 var programs = [];
+var intStudents = [];
 
 module.exports.initialize = function(){
     return new Promise((resolve, reject) => {
@@ -31,7 +32,7 @@ module.exports.getAllStudents = function(){
 
 module.exports.getInternationalStudents = function(){
     return new Promise((resolve, reject) => {
-        var intStudents = students.filter(s => s.isInternationalStudent === true);
+        intStudents = students.filter(s => s.isInternationalStudent === true);
         if(intStudents == 0){
             reject("There are no International Students listed!"); return;
         }
