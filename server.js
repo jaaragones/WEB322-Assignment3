@@ -62,15 +62,15 @@ app.use(function (req, res, next) {
 //********************************************************************************************** */
 app.post("/student/update", (req, res) => {
   console.log(req.body);
-  res.redirect("/students");
+  res.render()
 });
 
 app.post("/student/update", (req, res) => {
   data.updateStudent(req.body).then((data) => {
-      console.log(req.body);
-      res.redirect("/students");
+    console.log(req.body);
+    res.redirect("/students");
   }).catch((err) => {
-      console.log(err);
+    console.log(err);
   })
 });
 
@@ -142,7 +142,12 @@ app.get("/students", (req, res) => {
   if (req.query.status) {
     dataServ.getStudentsByStatus(req.query.status)
       .then((data) => {
-        res.render("students", { students: data });
+        if (data.length > 0) {
+          res.render("students", { students: data });
+        }
+        else {
+          res.render("students", { message: "no results" });
+        }
       })
       .catch((err) => {
         res.render({ message: "no results" });
@@ -151,68 +156,80 @@ app.get("/students", (req, res) => {
   else if (req.query.program) {
     dataServ.getStudentsByProgramCode(req.query.program)
       .then((data) => {
-        res.render("students", {students: data});
+        if (data.length > 0) {
+          res.render("students", { students: data });
+        }
+        else {
+          res.render("students", { message: "no results" });
+        }
       })
       .catch((err) => {
-        res.render("students", {message: "no results"});
+        res.render("students", { message: "no results" });
       })
   }
   else if (req.query.expectedCredential) {
     dataServ.getStudentsByExpectedCredential(req.query.expectedCredential)
       .then((data) => {
-        res.render("students", {students: data});
+        if (data.length > 0) {
+          res.render("students", { students: data });
+        }
+        else {
+          res.render("students", { message: "no results" });
+        }
       })
       .catch((err) => {
-        res.render("students", {message: "no results"});
+        res.render("students", { message: "no results" });
       })
   }
   else {
     dataServ.getAllStudents()
       .then((data) => {
-        res.render("students", {students: data});
+        if (data.length > 0) {
+          res.render("students", { students: data });
+        }
+        else {
+          res.render("students", { message: "no results" });
+        }
       })
       .catch((err) => {
-        res.render("students", {message: "no results"});
+        res.render("students", { message: "no results" });
       });
   }
-  // dataServ.getAllStudents()
-  //     .then((data) => {
-  //       res.json(data);
-  //     })
-  //     .catch((err) => {
-  //       console.log("Error retrieving students: " + err);
-  //       res.json({ message: err });
-  //     });
 });
 
 app.get("/students/:studentID", (req, res) => {
   dataServ.getStudentById(req.params.studentID)
     .then((data) => {
-      res.render("student", { student: data }); 
+      res.render("student", { student: data });
     })
     .catch((err) => {
-      res.render("student",{message: "no results"});
+      res.render("student", { message: "no results" });
     })
 });
 
 app.get("/intlstudents", (req, res) => {
   dataServ.getInternationalStudents(req.query.isInternationalStudent)
     .then((data) => {
-      res.render("students",{students:data});
+      res.render("students", { students: data });
     })
     .catch((err) => {
-      res.render({message: "no results"});
+      res.render({ message: "no results" });
     })
 });
 
-app.get("/programs", (req, res) => {
-  dataServ.getPrograms().then((data)=>{
-    res.render("programs",{programs:data});
+app.get("/programs", function (req, res) {
+  dataServ.getPrograms()
+    .then((data) => {
+      if(data.length > 0){
+      res.render("programs", { programs: data });
+      }
+      else{
+        res.render("programs", { message: "no results" });
+      }
     }).catch((err) => {
-      res.render({message: "no results"})
+      res.send(err)
     })
 });
-
 
 
 app.use((req, res) => {
