@@ -238,6 +238,37 @@ module.exports.updateProgram = function (programData) {
     });
 }
 
+module.exports.getProgramByProgramCode = function (pcode) {
+    return new Promise(function (resolve, reject) {
+      Program.findAll({
+        where:{
+          programCode: pcode
+        }
+      }).then(function(program){
+        resolve(program);
+      }).catch(()=>{
+        reject("no results returned");
+      })
+    });
+  }
+
+  module.exports.deleteProgramByCode = function (pcode) {
+    return new Promise(function (resolve, reject) {
+      Program.destroy({
+        where:{
+          programCode: pcode
+        }
+      }).then(function(program){
+        resolve("destroyed");
+      }).catch((err)=>{
+        reject("Destroy method encountered an error!");
+      })
+    });
+  }
+
+
+
+
 
 
 

@@ -231,6 +231,49 @@ app.get("/programs", function (req, res) {
     })
 });
 
+// new  Routes for Assignment 5
+app.get("/programs/add", function (req, res) {
+  res.render("addProgram");
+});
+
+app.post("/programs/add", function (req, res) {
+  dataServ.addProgram(req.body).then(() => {
+    res.redirect("/programs");
+  });
+});
+
+app.post("/program/update", (req, res) => {
+  dataServ
+    .updateProgram(req.body)
+    .then((data) => {
+      console.log(req.body);
+      res.redirect("/programs");
+    })
+});
+
+app.get("/program/:programCode", function (req, res) {
+  dataServ
+    .getProgramByProgramCode(req.params.programCode)
+    .then((data) => {
+      if (data) res.render("program", { program: data });
+      else res.status(404).send("Program Not Found");
+    })
+    .catch((err) => {
+      res.status(404).send("Program Not Found");
+    });
+});
+
+app.get("/program/delete/:programCode", function (req, res) {
+  dataServ
+    .deleteProgramByCode(req.params.programCode)
+    .then(() => {
+      res.render("programs");
+    })
+    .catch(() => {
+      res.status(500).send("Unable to Remove Program / Program not found");
+    });
+});
+
 
 app.use((req, res) => {
   res.status(404).send("<h2>404</h2><p>Im sorry! The page you are trying to reach is NOT FOUND!</p>");
