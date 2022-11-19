@@ -266,7 +266,16 @@ module.exports.getProgramByProgramCode = function (pcode) {
     });
   }
 
-
+  module.exports.deleteStudentById = function (id) {
+    return new Promise((resolve, reject) => {
+      Student.destroy({
+        where: {
+          studentID: id
+        }
+      }).then(() => resolve("destroyed"))
+        .catch((err) => reject("Destroy method encountered an error!"));
+    });
+  }
 
 
 

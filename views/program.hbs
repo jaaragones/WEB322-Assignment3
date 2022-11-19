@@ -4,6 +4,7 @@
         <br />
         <form method="post" action="/programs/update">
             <fieldset>
+              <legend>Personal Information</legend>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
@@ -14,7 +15,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="progName">Program Name</label>
-                            <input class="form-control" id="progName" name="programName" type="text" value="{{program.programCode}}" />
+                            <input class="form-control" id="progName" name="programName" type="text" value="{{program.programCode}}"readonly />
                         </div>
                     </div>
                 </div>

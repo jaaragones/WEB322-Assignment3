@@ -89,7 +89,14 @@ app.get("/about", (req, res) => {
 
 app.get("/students/add", (req, res) => {
   // res.sendFile(path.join(__dirname,'/views/addStudent.html'));
-  res.render("addStudent");
+  //res.render("addStudent");
+  dataServ.getPrograms()
+  .then((data) =>{
+    res.render("addStudent",{programs: data});
+  })
+  .catch(() => {
+    res.render("addStudent", {programs: []}); 
+  })
 });
 
 app.get("/images/add", (req, res) => {
@@ -197,15 +204,46 @@ app.get("/students", (req, res) => {
   }
 });
 
-app.get("/students/:studentID", (req, res) => {
-  dataServ.getStudentById(req.params.studentID)
-    .then((data) => {
-      res.render("student", { student: data });
-    })
-    .catch((err) => {
-      res.render("student", { message: "no results" });
-    })
+app.get("/student/:studentId", (req, res) => {
+
+  // initialize an empty object to store the values
+  let viewData = {};
+
+  dataService.getStudentByNum(req.params.studentId).then((data) => {
+      if (data) {
+          viewData.student = data; //store student data in the "viewData" object as "student"
+      } else {
+          viewData.student = null; // set student to null if none were returned
+      }
+  }).catch(() => {
+      viewData.student = null; // set student to null if there was an error 
+  }).then(dataService.getPrograms)
+  .then((data) => {
+      viewData.programs = data; // store program data in the "viewData" object as "programs"
+
+      // loop through viewData.programs and once we have found the programCode that matches
+      // the student's "program" value, add a "selected" property to the matching 
+      // viewData.programs object
+
+      for (let i = 0; i < viewData.programs.length; i++) {
+          if (viewData.programs[i].programCode == viewData.student.program) {
+              viewData.programs[i].selected = true;
+          }
+      }
+
+  }).catch(() => {
+      viewData.programs = []; // set programs to empty if there was an error
+  }).then(() => {
+      if (viewData.student == null) { // if no student - return an error
+          res.status(404).send("Student Not Found");
+      } else {
+          res.render("student", { viewData: viewData }); // render the "student" view
+      }
+  }).catch((err)=>{
+      res.status(500).send("Unable to Show Students");
+    });
 });
+
 
 app.get("/intlstudents", (req, res) => {
   dataServ.getInternationalStudents(req.query.isInternationalStudent)
@@ -220,10 +258,10 @@ app.get("/intlstudents", (req, res) => {
 app.get("/programs", function (req, res) {
   dataServ.getPrograms()
     .then((data) => {
-      if(data.length > 0){
-      res.render("programs", { programs: data });
+      if (data.length > 0) {
+        res.render("programs", { programs: data });
       }
-      else{
+      else {
         res.render("programs", { message: "no results" });
       }
     }).catch((err) => {
@@ -237,9 +275,10 @@ app.get("/programs/add", function (req, res) {
 });
 
 app.post("/programs/add", function (req, res) {
-  dataServ.addProgram(req.body).then(() => {
-    res.redirect("/programs");
-  });
+  dataServ.addProgram(req.body)
+    .then(() => {
+      res.redirect("/programs");
+    });
 });
 
 app.post("/program/update", (req, res) => {
@@ -255,8 +294,12 @@ app.get("/program/:programCode", function (req, res) {
   dataServ
     .getProgramByProgramCode(req.params.programCode)
     .then((data) => {
-      if (data) res.render("program", { program: data });
-      else res.status(404).send("Program Not Found");
+      if (data) {
+        res.render("program", { program: data });
+      }
+      else {
+        res.status(404).send("Program Not Found");
+      }
     })
     .catch((err) => {
       res.status(404).send("Program Not Found");
@@ -274,6 +317,14 @@ app.get("/program/delete/:programCode", function (req, res) {
     });
 });
 
+app.get("/student/delete/:studentID", (req, res) => {
+  dataService
+    .deleteStudentById(req.params.studentID)
+    .then(() => res.redirect("/students"))
+    .catch(() => {
+      res.status(500).send("Unable to Remove Student / Student not found")
+    });
+});
 
 app.use((req, res) => {
   res.status(404).send("<h2>404</h2><p>Im sorry! The page you are trying to reach is NOT FOUND!</p>");
