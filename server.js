@@ -209,7 +209,7 @@ app.get("/student/:studentId", (req, res) => {
   // initialize an empty object to store the values
   let viewData = {};
 
-  dataService.getStudentByNum(req.params.studentId).then((data) => {
+  dataServ.getStudentById(req.params.studentId).then((data) => {
       if (data) {
           viewData.student = data; //store student data in the "viewData" object as "student"
       } else {
@@ -217,7 +217,7 @@ app.get("/student/:studentId", (req, res) => {
       }
   }).catch(() => {
       viewData.student = null; // set student to null if there was an error 
-  }).then(dataService.getPrograms)
+  }).then(dataServ.getPrograms)
   .then((data) => {
       viewData.programs = data; // store program data in the "viewData" object as "programs"
 
@@ -255,47 +255,49 @@ app.get("/intlstudents", (req, res) => {
     })
 });
 
-app.get("/programs", function (req, res) {
+app.get("/programs", (req, res) => {
   dataServ.getPrograms()
-    .then((data) => {
-      if (data.length > 0) {
-        res.render("programs", { programs: data });
+    .then((programs) => {
+      if (programs.length > 0) {
+        res.render("programs", { data: programs });
       }
       else {
         res.render("programs", { message: "no results" });
       }
-    }).catch((err) => {
-      res.send(err)
+    }).catch(() => {
+      res.render("programs", { message: "no results" })
     })
 });
 
 // new  Routes for Assignment 5
-app.get("/programs/add", function (req, res) {
+app.get("/programs/add", (req, res) => {
   res.render("addProgram");
 });
 
-app.post("/programs/add", function (req, res) {
+app.post("/programs/add",(req, res) => {
   dataServ.addProgram(req.body)
     .then(() => {
-      res.redirect("/programs");
-    });
+      res.redirect("/programs")
+    }).catch(() => console.log("Could not add program"));
 });
 
 app.post("/program/update", (req, res) => {
   dataServ
     .updateProgram(req.body)
-    .then((data) => {
+    .then(() => {
       console.log(req.body);
       res.redirect("/programs");
-    })
+    }).catch((err) => {
+      res.status(500).send("Unable to Update Program");
+    });
 });
 
-app.get("/program/:programCode", function (req, res) {
+app.get("/program/:programCode",(req, res) => {
   dataServ
     .getProgramByProgramCode(req.params.programCode)
     .then((data) => {
-      if (data) {
-        res.render("program", { program: data });
+      if (data.length > 0) {
+        res.render("program", { program: data[0] });
       }
       else {
         res.status(404).send("Program Not Found");
@@ -306,11 +308,11 @@ app.get("/program/:programCode", function (req, res) {
     });
 });
 
-app.get("/program/delete/:programCode", function (req, res) {
+app.get("/program/delete/:programCode",(req, res) => {
   dataServ
     .deleteProgramByCode(req.params.programCode)
     .then(() => {
-      res.render("programs");
+      res.redirect("/programs")
     })
     .catch(() => {
       res.status(500).send("Unable to Remove Program / Program not found");
@@ -318,7 +320,7 @@ app.get("/program/delete/:programCode", function (req, res) {
 });
 
 app.get("/student/delete/:studentID", (req, res) => {
-  dataService
+  dataServ
     .deleteStudentById(req.params.studentID)
     .then(() => res.redirect("/students"))
     .catch(() => {

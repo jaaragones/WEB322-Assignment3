@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                {{#each students}}
+                {{#each data}}
                     <tr>
                     <td>{{studentID}}</td>
                     <td><a href="/student/{{studentID}}">{{firstName}} {{lastName}}</a>" </td>
@@ -29,7 +29,7 @@
                     <td><a href="/students?status={{status}}">{{status}}</a></td>
                     <td><a href="/students?program={{program}}">{{program}}</a></td>
                     <td>{{registrationDate}}</td>
-                    <td><a href="/programs/delete/{{studentID}}" class="btn btn-danger">remove</a></td>
+                    <td><a href="/student/delete/{{studentID}}" class="btn btn-danger">remove</a></td>
                     </tr>
                 {{else}}
                     <strong>No Students Available</strong>
