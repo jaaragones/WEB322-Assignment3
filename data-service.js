@@ -56,6 +56,41 @@ module.exports.initialize = function () {
 }
 
 
+
+// Students *********************************************************************************************
+module.exports.addStudent = function (studentData) {
+    return new Promise((resolve, reject) => {
+        studentData.isInternationalStudent = (studentData.isInternationalStudent) ? true : false;
+        for (var i in studentData) {
+            if (studentData[i] == "") {
+                studentData[i] = null;
+            }
+        }
+        Student.create({
+            firstName: studentData.firstName,
+            lastName: studentData.lastName,
+            email: studentData.email,
+            phone: studentData.phone,
+            addressStreet: studentData.addressStreet,
+            addressCity: studentData.addressCity,
+            addressState: studentData.addressState,
+            addressPostal: studentData.addressPostal,
+            isInternationalStudent: studentData.isInternationalStudent,
+            program: studentData.program,
+            expectedCredential: studentData.expectedCredential,
+            status: studentData.status,
+            registrationDate: studentData.registrationDate,
+          })
+            .then((students) => {
+              resolve(students);
+            })
+            .catch(() => {
+                reject("unable to create student");
+            })
+    });
+}
+
+
 module.exports.getAllStudents = function () {
     return new Promise((resolve, reject) => {
         sequelize
@@ -87,35 +122,7 @@ module.exports.getInternationalStudents = function () {
     });
 }
 
-module.exports.getPrograms = function () {
-    return new Promise((resolve, reject) => {
-        Program.findAll()
-            .then((data) => {
-                resolve(data);
-            })
-            .catch(() => {
-                reject("no results returned");
-            });
-    });
-}
 
-module.exports.addStudent = function (studentData) {
-    return new Promise((resolve, reject) => {
-        studentData.isInternationalStudent = (studentData.isInternationalStudent) ? true : false;
-        for (var i in studentData) {
-            if (studentData[i] == "") {
-                studentData[i] = null;
-            }
-        }
-        Student.create(studentData)
-            .then((Student) => {
-                resolve(Student);
-            })
-            .catch(() => {
-                reject("unable to create student");
-            })
-    });
-}
 
 module.exports.getStudentsByStatus = function (status) {
     return new Promise((resolve, reject) => {
@@ -193,9 +200,30 @@ module.exports.updateStudent = function (studentData) {
                 studentData[i] = null;
             }
         }
-        Student.update(studentData)
-            .then((Student) => {
-                resolve(Student);
+        Student.update(
+            {
+              firstName: studentData.firstName,
+              lastName: studentData.lastName,
+              email: studentData.email,
+              phone: studentData.phone,
+              addressStreet: studentData.addressStreet,
+              addressCity: studentData.addressCity,
+              addressState: studentData.addressState,
+              addressPostal: studentData.addressPostal,
+              isInternationalStudent: studentData.isInternationalStudent,
+              program: studentData.program,
+              expectedCredential: studentData.expectedCredentials,
+              status: studentData.status,
+              registrationDate: studentData.registrationDate,
+            },
+            {
+              where: {
+                studentID: studentData.studentID,
+              },
+            }
+          )
+            .then(() => {
+              resolve();
             })
             .catch(() => {
                 reject("unable to create student");
@@ -203,22 +231,37 @@ module.exports.updateStudent = function (studentData) {
     });
 }
 
-// Adding new data-service.js functions
+
+// Program *************************************************************************************
 module.exports.addProgram = function (programData) {
-    return new Promise((resolve, reject) => {
-        for (var i in studentData) {
-            if (studentData[i] == "") {
-                studentData[i] = null;
+    return new Promise(function(resolve, reject)  {
+        for (var i in programData) {
+            if (programData[i] == "") {
+                programData[i] = null;
             }
         }
         Program.create({
             programCode: programData.programCode,
             programName: programData.programName,
         })
-            .then(() => resolve())
+            .then(() =>{ resolve();})
             .catch(() => reject("unable to create program"));
     });
 };
+
+// Adding new data-service.js functions
+module.exports.getPrograms = function () {
+    return new Promise(function (resolve, reject) {
+        Program.findAll()
+            .then(function(programs) {
+                resolve(programs);
+            })
+            .catch(() => {
+                reject("no results returned");
+            });
+    });
+}
+
 
 module.exports.updateProgram = function (programData) {
     return new Promise((resolve, reject) => {
@@ -230,10 +273,10 @@ module.exports.updateProgram = function (programData) {
         Program.update({ programName: programData.programName }, {
             where: {
                 programCode: programData.programCode,
-            }
+            },
         })
-            .then((Program) => {
-                resolve(Program);
+            .then(() => {
+                resolve();
             })
             .catch(() => {
                 reject("could not update program");
@@ -242,12 +285,12 @@ module.exports.updateProgram = function (programData) {
 }
 
 module.exports.getProgramByProgramCode = function (pcode) {
-    return new Promise((resolve, reject) => {
+    return new Promise(function(resolve, reject) {
         Program.findAll({
             where: {
-                programCode: pcode
+                programCode: pcode,
             }
-        }).then((program) => {
+        }).then(function(program) {
             resolve(program[0]);
         }).catch(() => {
             reject("unable to update program");

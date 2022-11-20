@@ -278,14 +278,13 @@ app.post("/programs/add",(req, res) => {
   dataServ.addProgram(req.body)
     .then(() => {
       res.redirect("/programs")
-    }).catch(() => console.log("Could not add program"));
+    });
 });
 
 app.post("/program/update", (req, res) => {
   dataServ
     .updateProgram(req.body)
     .then(() => {
-      console.log(req.body);
       res.redirect("/programs");
     }).catch((err) => {
       res.status(500).send("Unable to Update Program");
@@ -297,7 +296,7 @@ app.get("/program/:programCode",(req, res) => {
     .getProgramByProgramCode(req.params.programCode)
     .then((data) => {
       if (data.length > 0) {
-        res.render("program", { program: data[0] });
+        res.render("program", { program: data });
       }
       else {
         res.status(404).send("Program Not Found");
