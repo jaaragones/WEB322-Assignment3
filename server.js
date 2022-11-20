@@ -1,9 +1,9 @@
 /*********************************************************************************
-*  WEB322 – Assignment 02
+*  WEB322 – Assignment 05
 *  I declare that this assignment is my own work in accordance with Seneca  Academic Policy.  No part *  of this assignment has been copied manually or electronically from any other source 
 *  (including 3rd party web sites) or distributed to other students.
 * 
-*  Name: John Aeron Aragones   Student ID: 121107213   Date: NOV 04 ,2022
+*  Name: John Aeron Aragones   Student ID: 121107213   Date: NOV 20 ,2022
 *
 *  Online (Cyclic) Link: https://dead-red-shrimp-kit.cyclic.app
 *
@@ -87,16 +87,17 @@ app.get("/about", (req, res) => {
   res.render("about");
 });
 
-app.get("/students/add", (req, res) => {
+app.get("/students/add",function (req, res) {
   // res.sendFile(path.join(__dirname,'/views/addStudent.html'));
   //res.render("addStudent");
-  dataServ.getPrograms()
-  .then((data) =>{
-    res.render("addStudent",{programs: data});
-  })
-  .catch(() => {
-    res.render("addStudent", {programs: []}); 
-  })
+  dataServ
+    .getPrograms()
+    .then((data) => {
+      res.render("addStudent", { programs: data });
+    })
+    .catch(() => {
+      res.render("addStudent", { programs: [] });
+    });
 });
 
 app.get("/images/add", (req, res) => {
@@ -124,10 +125,14 @@ app.post("/images/add", upload.single("imageFile"), (req, res) => {
 });
 
 app.post("/students/add", (req, res) => {
-  dataServ.addStudent(req.body)
+  dataServ.addStudents(req.body)
     .then(() => {
       res.redirect("/students");
     })
+    .catch((err)=>{
+      res.status(500).send("Unable to Update Student");
+});
+
 });
 
 
@@ -145,61 +150,44 @@ app.get("/images", (req, res) => {
 
 
 // Retrieves Students Data
+
 app.get("/students", (req, res) => {
   if (req.query.status) {
     dataServ.getStudentsByStatus(req.query.status)
-      .then((data) => {
-        if (data.length > 0) {
-          res.render("students", { students: data });
-        }
-        else {
-          res.render("students", { message: "no results" });
-        }
+      .then((students) => {
+        res.render("students", { data: students })
       })
-      .catch((err) => {
-        res.render({ message: "no results" });
-      })
-  }
-  else if (req.query.program) {
+      .catch(() => {
+        res.render("students", { message: "no results" })
+      });
+  } else if (req.query.program) {
     dataServ.getStudentsByProgramCode(req.query.program)
-      .then((data) => {
-        if (data.length > 0) {
-          res.render("students", { students: data });
-        }
-        else {
-          res.render("students", { message: "no results" });
-        }
+      .then((students) => {
+        res.render("students", { data: students })
       })
-      .catch((err) => {
-        res.render("students", { message: "no results" });
+      .catch(() => {
+        res.render("students", { message: "no results" })
+      });
+  } else if (req.query.credential) {
+    dataService.getStudentsByExpectedCredential(req.query.credential)
+      .then((students) => {
+        res.render("students", { data: students })
       })
-  }
-  else if (req.query.expectedCredential) {
-    dataServ.getStudentsByExpectedCredential(req.query.expectedCredential)
-      .then((data) => {
-        if (data.length > 0) {
-          res.render("students", { students: data });
-        }
-        else {
-          res.render("students", { message: "no results" });
-        }
-      })
-      .catch((err) => {
-        res.render("students", { message: "no results" });
-      })
-  }
-  else {
+      .catch(() => {
+        res.render("students", { message: "no results" })
+      });
+  } else {
     dataServ.getAllStudents()
-      .then((data) => {
-        if (data.length > 0) {
-          res.render("students", { students: data });
-        }
+      .then((students) => {
+        if (students.length > 0) {
+          res.render("students", { data: students });
+        } 
         else {
           res.render("students", { message: "no results" });
         }
       })
-      .catch((err) => {
-        res.render("students", { message: "no results" });
+      .catch(() => {
+        res.render("students", { message: "no results" })
       });
   }
 });
@@ -259,7 +247,7 @@ app.get("/programs", (req, res) => {
   dataServ.getPrograms()
     .then((programs) => {
       if (programs.length > 0) {
-        res.render("programs", { data: programs });
+        res.render("programs", { programs: programs });
       }
       else {
         res.render("programs", { message: "no results" });
@@ -270,15 +258,14 @@ app.get("/programs", (req, res) => {
 });
 
 // new  Routes for Assignment 5
-app.get("/programs/add", (req, res) => {
+app.get("/programs/add", function (req, res) {
   res.render("addProgram");
 });
 
-app.post("/programs/add",(req, res) => {
-  dataServ.addProgram(req.body)
-    .then(() => {
-      res.redirect("/programs")
-    });
+app.post("/programs/add", function (req, res) {
+  dataServ.addProgram(req.body).then(() => {
+    res.redirect("/programs");
+  });
 });
 
 app.post("/program/update", (req, res) => {
@@ -296,7 +283,7 @@ app.get("/program/:programCode",(req, res) => {
     .getProgramByProgramCode(req.params.programCode)
     .then((data) => {
       if (data.length > 0) {
-        res.render("program", { program: data });
+        res.render("program", { program: data[0] });
       }
       else {
         res.status(404).send("Program Not Found");

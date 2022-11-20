@@ -31,7 +31,7 @@ var Student = sequelize.define('Student', {
     registrationDate: Sequelize.STRING
 });
 
-var Program = sequelize.define('Program', {
+var Program= sequelize.define('Program', {
     programCode: {
         type: Sequelize.STRING,
         primaryKey: true
@@ -39,7 +39,7 @@ var Program = sequelize.define('Program', {
     programName: Sequelize.STRING
 });
 
-Program.hasMany(Student, { foreignKey: 'program' });
+Program.hasMany(Student, { foreignKey: "program" });
 // **************************************************************************************************************************
 
 module.exports.initialize = function () {
@@ -58,13 +58,13 @@ module.exports.initialize = function () {
 
 
 // Students *********************************************************************************************
-module.exports.addStudent = function (studentData) {
-    return new Promise((resolve, reject) => {
-        studentData.isInternationalStudent = (studentData.isInternationalStudent) ? true : false;
+module.exports.addStudents = function (studentData) {
+    return new Promise(function(resolve, reject)  {
+        studentData.isInternationalStudent = studentData.isInternationalStudent ? true : false;
         for (var i in studentData) {
-            if (studentData[i] == "") {
+            if (studentData[i] == "") 
                 studentData[i] = null;
-            }
+            
         }
         Student.create({
             firstName: studentData.firstName,
@@ -86,19 +86,18 @@ module.exports.addStudent = function (studentData) {
             })
             .catch(() => {
                 reject("unable to create student");
-            })
+            });
     });
 }
 
 
 module.exports.getAllStudents = function () {
-    return new Promise((resolve, reject) => {
-        sequelize
-            .Student.findAll(Student)
-            .then(() => {
-                resolve(Student);
+    return new Promise(function(resolve, reject) {
+            Student.findAll()
+            .then(function(students) {
+                resolve(students);
             })
-            .catch((err) => {
+            .catch(() => {
                 reject("no results returned");
             });
     });
@@ -113,8 +112,8 @@ module.exports.getInternationalStudents = function () {
                 isInternationalStudent: true
             }
         })
-            .then(function (Student) {
-                resolve(Student);
+            .then(function (students) {
+                resolve(students);
             })
             .catch(() => {
                 reject("no results returned");
@@ -132,8 +131,8 @@ module.exports.getStudentsByStatus = function (status) {
                 status: status
             }
         })
-            .then(function (Student) {
-                resolve(Student);
+            .then(function (students) {
+                resolve(students);
             })
             .catch((err) => {
                 reject("no results returned");
@@ -166,8 +165,8 @@ module.exports.getStudentsByExpectedCredential = function (credential) {
                 expectedCredential: credential
             }
         })
-            .then(function (credential) {
-                resolve(credential);
+            .then(function (students) {
+                resolve(students);
             })
             .catch((err) => {
                 reject("no results returned");
@@ -183,8 +182,8 @@ module.exports.getStudentById = function (sid) {
                 studentID: sid
             }
         })
-            .then(function (sid) {
-                resolve(sid);
+            .then(function (students) {
+                resolve(students);
             })
             .catch((err) => {
                 reject("no results returned");
@@ -230,6 +229,18 @@ module.exports.updateStudent = function (studentData) {
             })
     });
 }
+
+module.exports.deleteStudentById = function (id) {
+    return new Promise((resolve, reject) => {
+        Student.destroy({
+            where: {
+                studentID: id
+            }
+        }).then(() => resolve())
+            .catch(() => reject("Destroy method encountered an error!"));
+    });
+};
+
 
 
 // Program *************************************************************************************
@@ -312,16 +323,6 @@ module.exports.deleteProgramByCode = function (pcode) {
     });
 }
 
-module.exports.deleteStudentById = function (id) {
-    return new Promise((resolve, reject) => {
-        Student.destroy({
-            where: {
-                studentID: id
-            }
-        }).then(() => resolve())
-            .catch(() => reject("Destroy method encountered an error!"));
-    });
-};
 
 
 
