@@ -1,9 +1,9 @@
+const bcrypt = require('bcryptjs');
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
-const bcrypt = require('bcryptjs');
 
 var userSchema = new Schema({
-  userName: String,
+  userName: { type: String, unique: true },
   password: String,
   email: String,
   loginHistory: [{
@@ -14,7 +14,7 @@ var userSchema = new Schema({
 
 const initialize = function () {
   return new Promise(function (resolve, reject) {
-    let db = mongoose.createConnection("mongodb+srv://web322:web322@cluster0.l7ztclh.mongodb.net/?retryWrites=true&w=majority");
+    let db = mongoose.createConnection("mongodb+srv://user:user123@cluster0.smxv1pp.mongodb.net/?retryWrites=true&w=majority");
 
     db.on('error', (err) => {
       reject(err); // reject the promise with the provided error
@@ -33,8 +33,8 @@ const registerUser = function (userData) {
       reject('Passwords do not match');
     }
 
-    bcrypt.genSalt(10)  // Generate a "salt" using 10 rounds
-      .then(salt => bcrypt.hash(userData.password, salt)) // encrypt the password: "myPassword123"
+    bcrypt.genSalt(10)
+      .then(salt => bcrypt.hash(userData.password, salt))
       .then(hash => {
         userData.password = hash;
         let newUser = new User(userData);
@@ -51,7 +51,7 @@ const registerUser = function (userData) {
         });
       })
       .catch(err => {
-        reject('There was an error encrypting the password'); // Show any errors that occurred during the process
+        reject('There was an error encrypting the password');
       });
   });
 }

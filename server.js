@@ -19,7 +19,7 @@ const bodyParser = require('body-parser');
 const { resolveSoa } = require("dns");
 const exphbs = require("express-handlebars");
 const dataServiceAuth = require("./data-service-auth.js")
-const clientSessions =require('client-sessions');
+const clientSessions = require('client-sessions');
 app.use(express.static('public'));
 
 
@@ -55,10 +55,10 @@ app.set('view engine', '.hbs');
 
 
 app.use(clientSessions({
-  cookieName: 'session', 
-  secret: 'web322', 
-  duration: 2 * 60 * 1000, 
-  activeDuration: 1000 * 60 
+  cookieName: 'session',
+  secret: 'web322',
+  duration: 2 * 60 * 1000,
+  activeDuration: 1000 * 60
 }));
 
 function ensureLogin(req, res, next) {
@@ -69,7 +69,7 @@ function ensureLogin(req, res, next) {
   }
 }
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.locals.session = req.session;
   next();
 });
@@ -88,12 +88,12 @@ app.use(function (req, res, next) {
   next();
 });
 //********************************************************************************************** */
-app.post("/student/update",ensureLogin, (req, res) => {
+app.post("/student/update", ensureLogin, (req, res) => {
   console.log(req.body);
   res.render()
 });
 
-app.post("/student/update",ensureLogin ,(req, res) => {
+app.post("/student/update", ensureLogin, (req, res) => {
   dataServ.updateStudent(req.body).then((data) => {
     console.log(req.body);
     res.redirect("/students");
@@ -112,16 +112,16 @@ app.get('/login', (req, res, next) => {
 app.post('/login', (req, res, next) => {
   req.body.userAgent = req.get('User-Agent');
   return dataServiceAuth.checkUser(req.body)
-  .then((user)=>{
-    req.session.user = {
-      userName: user.userName, // authenticated user's userName
-      email:user.email, // authenticated user's email
-      loginHistory:user.loginHistory // authenticated user's loginHistory
-    }
-    res.redirect('/students');
-  }).catch((err)=>{
-    res.render('login', {errorMessage: err, userName: req.body.userName});
-  })
+    .then((user) => {
+      req.session.user = {
+        userName: user.userName,
+        email: user.email,
+        loginHistory: user.loginHistory
+      }
+      res.redirect('/students');
+    }).catch((err) => {
+      res.render('login', { errorMessage: err, userName: req.body.userName });
+    })
 });
 
 app.get('/register', (req, res, next) => {
@@ -130,19 +130,19 @@ app.get('/register', (req, res, next) => {
 
 app.post('/register', (req, res, next) => {
   return dataServiceAuth
-  .registerUser(req.body)
-  .then((resp)=>{
-     res.render('register', {successMessage: "User created"});
-  }).catch((err)=>{
-    return res.render('register',  {errorMessage: err, userName: req.body.userName});
-  });
+    .registerUser(req.body)
+    .then((resp) => {
+      res.render('register', { successMessage: "User created" });
+    }).catch((err) => {
+      return res.render('register', { errorMessage: err, userName: req.body.userName });
+    });
 });
 
-app.get("/userHistory", ensureLogin, function(req, res) {
+app.get("/userHistory", ensureLogin, function (req, res) {
   res.render("userHistory");
 });
 
-app.get("/logout", function(req, res) {
+app.get("/logout", function (req, res) {
   req.session.reset();
   res.redirect("/");
 });
@@ -159,7 +159,7 @@ app.get("/about", (req, res) => {
   res.render("about");
 });
 
-app.get("/images/add", ensureLogin,(req, res) => {
+app.get("/images/add", ensureLogin, (req, res) => {
   // res.sendFile(path.join(__dirname,'/views/addImage.html'));
   res.render("addImage");
 });
@@ -183,14 +183,14 @@ app.post("/images/add", upload.single("imageFile"), (req, res) => {
   res.redirect("/images");
 });
 
-app.post("/students/add", ensureLogin,(req, res) => {
+app.post("/students/add", ensureLogin, (req, res) => {
   dataServ.addStudents(req.body)
     .then(() => {
       res.redirect("/students");
     })
-    .catch((err)=>{
+    .catch((err) => {
       res.status(500).send("Unable to Update Student");
-});
+    });
 
 });
 
@@ -200,14 +200,14 @@ app.get('/images', (req, res) => {
     console.log(data)
     res.render('images', {
       data: data,
-      layout: false 
+      layout: false
     })
   })
 })
 
 // Retrieves Students Data
 
-app.get("/students", ensureLogin,(req, res, next) => {
+app.get("/students", ensureLogin, (req, res, next) => {
   if (req.query.status) {
     dataServ.getStudentsByStatus(req.query.status)
       .then((students) => {
@@ -237,7 +237,7 @@ app.get("/students", ensureLogin,(req, res, next) => {
       .then((students) => {
         if (students.length > 0) {
           res.render("students", { data: students });
-        } 
+        }
         else {
           res.render("students", { message: "no results" });
         }
@@ -254,15 +254,15 @@ app.get("/student/:studentId", ensureLogin, (req, res) => {
   let viewData = {};
 
   dataServ.getStudentById(req.params.studentId).then((data) => {
-      if (data) {
-          viewData.student = data; //store student data in the "viewData" object as "student"
-      } else {
-          viewData.student = null; // set student to null if none were returned
-      }
+    if (data) {
+      viewData.student = data; //store student data in the "viewData" object as "student"
+    } else {
+      viewData.student = null; // set student to null if none were returned
+    }
   }).catch(() => {
-      viewData.student = null; // set student to null if there was an error 
+    viewData.student = null; // set student to null if there was an error 
   }).then(dataServ.getPrograms)
-  .then((data) => {
+    .then((data) => {
       viewData.programs = data; // store program data in the "viewData" object as "programs"
 
       // loop through viewData.programs and once we have found the programCode that matches
@@ -270,26 +270,26 @@ app.get("/student/:studentId", ensureLogin, (req, res) => {
       // viewData.programs object
 
       for (let i = 0; i < viewData.programs.length; i++) {
-          if (viewData.programs[i].programCode == viewData.student.program) {
-              viewData.programs[i].selected = true;
-          }
+        if (viewData.programs[i].programCode == viewData.student.program) {
+          viewData.programs[i].selected = true;
+        }
       }
 
-  }).catch(() => {
+    }).catch(() => {
       viewData.programs = []; // set programs to empty if there was an error
-  }).then(() => {
+    }).then(() => {
       if (viewData.student == null) { // if no student - return an error
-          res.status(404).send("Student Not Found");
+        res.status(404).send("Student Not Found");
       } else {
-          res.render("student", { viewData: viewData }); // render the "student" view
+        res.render("student", { viewData: viewData }); // render the "student" view
       }
-  }).catch((err)=>{
+    }).catch((err) => {
       res.status(500).send("Unable to Show Students");
     });
 });
 
 
-app.get("/intlstudents",ensureLogin ,(req, res,next) => {
+app.get("/intlstudents", ensureLogin, (req, res, next) => {
   dataServ.getInternationalStudents(req.query.isInternationalStudent)
     .then((data) => {
       res.render("students", { students: data });
@@ -299,7 +299,7 @@ app.get("/intlstudents",ensureLogin ,(req, res,next) => {
     })
 });
 
-app.get("/programs", ensureLogin,(req, res,next) => {
+app.get("/programs", ensureLogin, (req, res, next) => {
   dataServ.getPrograms()
     .then((programs) => {
       if (programs.length > 0) {
@@ -314,11 +314,11 @@ app.get("/programs", ensureLogin,(req, res,next) => {
 });
 
 // new  Routes for Assignment 5
-app.get("/programs/add", ensureLogin ,(req, res, next) => {
+app.get("/programs/add", ensureLogin, (req, res, next) => {
   res.render("addProgram");
 });
 
-app.post("/programs/add", ensureLogin, (req, res,next) => {
+app.post("/programs/add", ensureLogin, (req, res, next) => {
   dataServ.addProgram(req.body).then(() => {
     res.redirect("/programs");
   });
@@ -334,9 +334,9 @@ app.post("/program/update", ensureLogin, (req, res) => {
     });
 });
 
-app.get("/program/:programCode",ensureLogin,(req, res,next) => {
+app.get("/program/:programCode", ensureLogin, (req, res, next) => {
   dataServ
-  .getProgramByProgramCode(req.params.programCode)
+    .getProgramByProgramCode(req.params.programCode)
     .then((data) => {
       if (data.length > 0) {
         res.render("program", { program: data[0] });
@@ -350,7 +350,7 @@ app.get("/program/:programCode",ensureLogin,(req, res,next) => {
     });
 });
 
-app.get("/program/delete/:programCode",ensureLogin,(req, res) => {
+app.get("/program/delete/:programCode", ensureLogin, (req, res) => {
   dataServ
     .deleteProgramByCode(req.params.programCode)
     .then(() => {
@@ -361,7 +361,7 @@ app.get("/program/delete/:programCode",ensureLogin,(req, res) => {
     });
 });
 
-app.get("/student/delete/:studentID", ensureLogin,(req, res) => {
+app.get("/student/delete/:studentID", ensureLogin, (req, res) => {
   dataServ
     .deleteStudentById(req.params.studentID)
     .then(() => res.redirect("/students"))
@@ -374,24 +374,14 @@ app.use((req, res) => {
   res.status(404).send("<h2>404</h2><p>Im sorry! The page you are trying to reach is NOT FOUND!</p>");
 });
 
+// Assignment 6  ******************************************************************
 
-// setup http server to listen on HTTP_PORT
 dataServ.initialize()
-  .then(() => {
-    app.listen(HTTP_PORT, onHttpStart);
-  }).catch((err) => {
-    console.log("Error: ", err)
-  })
-
-
-  // Assignment 6  ******************************************************************
-
-  dataServ.initialize()
-.then(dataServiceAuth.initialize)
-.then(function(){
-    app.listen(HTTP_PORT, function(){
-        console.log("app listening on: " + HTTP_PORT)
+  .then(dataServiceAuth.initialize)
+  .then(function () {
+    app.listen(HTTP_PORT, function () {
+      console.log("app listening on: " + HTTP_PORT)
     });
-}).catch(function(err){
+  }).catch(function (err) {
     console.log("unable to start server: " + err);
-});
+  });
